@@ -5,14 +5,11 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import accuracy_score, classification_report
 
-# Pima Indians Diabetes Dataset (768 samples)
-# Features: Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin, BMI, DiabetesPedigreeFunction, Age
-# Source: https://www.kaggle.com/datasets/uciml/pima-indians-diabetes-database
-# This is the actual dataset values embedded for portability
+
 
 np.random.seed(42)
 
-# Full Pima Indians Diabetes Dataset (768 records)
+
 data = np.array([
 [6,148,72,35,0,33.6,0.627,50,1],[1,85,66,29,0,26.6,0.351,31,0],[8,183,64,0,0,23.3,0.672,32,1],
 [1,89,66,23,94,28.1,0.167,21,0],[0,137,40,35,168,43.1,2.288,33,1],[5,116,74,0,0,25.6,0.201,30,0],
@@ -180,26 +177,23 @@ print(f"Accuracy: {acc:.4f}")
 print(f"CV Mean: {cv_scores.mean():.4f} ± {cv_scores.std():.4f}")
 print(classification_report(y_test, y_pred, target_names=['No Diabetes', 'Diabetes']))
 
-# Export model params as JSON for use in the web
-# We'll export tree structure via sklearn's export, but better: export feature importances + threshold logic
-# Actually let's compute everything needed for JS scoring
 
-# Get feature importances
+
+
 importances = model.feature_importances_.tolist()
 
-# Export scaler params
+
 scaler_mean = scaler.mean_.tolist()
 scaler_scale = scaler.scale_.tolist()
 
-# Export individual tree predictions as a lookup table approach won't work well
-# Better: train a logistic regression for clean JS export
+
 from sklearn.linear_model import LogisticRegression
 lr = LogisticRegression(random_state=42, max_iter=1000, class_weight='balanced')
 lr.fit(X_train, y_train)
 lr_acc = accuracy_score(y_test, lr.predict(X_test))
 print(f"\nLogistic Regression Accuracy: {lr_acc:.4f}")
 
-# Export LR params
+
 coef = lr.coef_[0].tolist()
 intercept = lr.intercept_[0]
 
